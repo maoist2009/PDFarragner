@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Touch optimization */
+@media (hover: none) {
+  button, a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Prevent rubber-band on iOS */
+html {
+  overscroll-behavior: none;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Grid auto-fill for responsive */
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+
+/* Scrollbar hide utility (for horizontal-scrolling badges on mobile) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* For drag-over feedback in outline editor */
+.drop-target-above {
+  border-top: 2px solid #3b82f6 !important;
+}
+.drop-target-below {
+  border-bottom: 2px solid #3b82f6 !important;
+}
+.drop-target-into {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Badge marquee: if text overflows, it slides on hover / focus-within.
+   On mobile (touch), it auto-animates after a delay so user can read the full name. */
+@keyframes badgeMarquee {
+  0%   { transform: translateX(0); }
+  30%  { transform: translateX(0); }
+  70%  { transform: translateX(var(--marquee-offset, -50%)); }
+  100% { transform: translateX(var(--marquee-offset, -50%)); }
+}
+.badge-marquee {
+  /* Default: no animation, just static */
+}
+/* On hover on desktop, slide if overflowing */
+div:hover > .badge-marquee {
+  animation: badgeMarquee 3s ease-in-out infinite alternate;
+  --marquee-offset: calc(-100% + 80px);
+}
+/* On touch devices, always animate so user can read */
+@media (hover: none) {
+  .badge-marquee {
+    animation: badgeMarquee 4s 1s ease-in-out infinite alternate;
+    --marquee-offset: calc(-100% + 80px);
+  }
+}
