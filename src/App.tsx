@@ -11,7 +11,6 @@ import ContextMenu from './components/ContextMenu';
 import ExportDialog from './components/ExportDialog';
 import HelpDialog from './components/HelpDialog';
 import SinglePageView from './components/SinglePageView';
-import OutlineEditor from './components/OutlineEditor';
 
 function AppContent() {
   const { state, dispatch } = useStore();
@@ -121,8 +120,7 @@ function AppContent() {
           <div className="flex items-center gap-2">
             <button onClick={() => setShowHelp(true)} className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200">❓</button>
             <button onClick={() => setQuality(q => q === 0.5 ? 1 : q === 1 ? 1.5 : 0.5)}
-              className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
-              title={t('renderQuality', lang)}>
+              className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
               {quality <= 0.5 ? `🐢 ${t('low', lang)}` : quality >= 1.5 ? `🚀 ${t('high', lang)}` : `⚡ ${t('medium', lang)}`}
             </button>
             <button onClick={() => setLang(l => l === 'zh' ? 'en' : 'zh')}
@@ -161,8 +159,7 @@ function AppContent() {
       <header className="flex items-center justify-between px-3 py-1.5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 z-40 relative">
         <div className="flex items-center gap-2 min-w-0">
           <button onClick={() => setShowSidebar(s => !s)}
-            className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-lg flex-shrink-0"
-            title={t('navigator', lang)}>☰</button>
+            className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-lg flex-shrink-0" title={t('navigator', lang)}>☰</button>
           <h1 className="text-sm font-bold text-gray-800 dark:text-gray-200 hidden md:block flex-shrink-0">✂️ {t('appTitle', lang)}</h1>
           <span className="text-[11px] text-gray-400 hidden sm:inline tabular-nums flex-shrink-0">
             {state.pages.length}{t('pages', lang)}
@@ -172,8 +169,7 @@ function AppContent() {
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           <button onClick={() => setQuality(q => q === 0.5 ? 1 : q === 1 ? 1.5 : 0.5)}
-            className="px-1.5 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
-            title={t('qualityHint', lang)}>
+            className="px-1.5 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400" title={t('qualityHint', lang)}>
             {quality <= 0.5 ? '🐢' : quality >= 1.5 ? '🚀' : '⚡'}
           </button>
           <button onClick={() => setLang(l => l === 'zh' ? 'en' : 'zh')}
@@ -181,8 +177,7 @@ function AppContent() {
             {lang === 'zh' ? 'EN' : '中文'}
           </button>
           <button onClick={() => setShowHelp(true)}
-            className="px-1.5 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200"
-            title={t('help', lang)}>❓</button>
+            className="px-1.5 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200" title={t('help', lang)}>❓</button>
           <button onClick={() => setShowExport(true)}
             className="px-2.5 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 font-medium">
             📦 {t('exportZip', lang)}
@@ -323,21 +318,56 @@ function AppContent() {
       )}
 
       {showOutlineEditor && (
-        <OutlineEditor lang={lang}
-          initialOutline={state.customOutline ?? (() => {
-            // Merge source outlines with global page indices
-            const result: import('./types').OutlineItem[] = [];
-            const offsetItems = (items: import('./types').OutlineItem[], off: number): import('./types').OutlineItem[] =>
-              items.map(it => ({ title: it.title, pageIndex: it.pageIndex + off, children: offsetItems(it.children, off) }));
-            for (const sf of state.sourceFiles) {
-              const firstIdx = state.pages.findIndex(p => p.sourceId === sf.id && p.sourcePageIndex === 0);
-              if (firstIdx >= 0 && sf.outline.length > 0) result.push(...offsetItems(sf.outline, firstIdx));
-            }
-            return result;
-          })()}
-          totalPages={state.pages.length}
-          onSave={(outline) => dispatch({ type: 'SET_CUSTOM_OUTLINE', outline })}
-          onClose={() => setShowOutlineEditor(false)} />
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-2 sm:p-4" onClick={() => setShowOutlineEditor(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full shadow-2xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="font-bold text-gray-800 dark:text-gray-200">📑 {t('editOutline', lang)}</h2>
+              <button onClick={() => setShowOutlineEditor(false)} className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">✕</button>
+            </div>
+            <OutlinePanel
+              lang={lang}
+              sourceFiles={state.sourceFiles}
+              pages={state.pages}
+              splitPoints={state.splitPoints}
+              customOutline={state.customOutline}
+              onJumpTo={() => {}}
+              onSelectRange={() => {}}
+              onEditOutline={() => {}}
+            />
+            <div className="flex gap-2 p-3 border-t border-gray-200 dark:border-gray-700">
+              <button onClick={() => setShowOutlineEditor(false)} className="flex-1 py-2 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">{t('cancel', lang)}</button>
+              <button onClick={() => {
+                // Save the custom outline
+                const outline = state.customOutline ?? (() => {
+                  const result: import('./types').OutlineItem[] = [];
+                  const offsetItems = (items: import('./types').OutlineItem[], off: number): import('./types').OutlineItem[] =>
+                    items.map(it => ({ title: it.title, pageIndex: it.pageIndex + off, children: offsetItems(it.children, off) }));
+                  for (const sf of state.sourceFiles) {
+                    const firstIdx = state.pages.findIndex(p => p.sourceId === sf.id && p.sourcePageIndex === 0);
+                    if (firstIdx >= 0) {
+                      if (sf.outline.length > 0) {
+                        result.push({
+                          title: sf.name,
+                          pageIndex: firstIdx,
+                          children: offsetItems(sf.outline, firstIdx)
+                        });
+                      } else {
+                        result.push({
+                          title: sf.name,
+                          pageIndex: firstIdx,
+                          children: []
+                        });
+                      }
+                    }
+                  }
+                  return result;
+                })();
+                dispatch({ type: 'SET_CUSTOM_OUTLINE', outline });
+                setShowOutlineEditor(false);
+              }} className="flex-1 py-2 rounded bg-blue-600 text-white font-medium">{t('saveOutline', lang)}</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

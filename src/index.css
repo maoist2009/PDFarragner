@@ -117,3 +117,65 @@ div:hover > .badge-marquee {
     --marquee-offset: calc(-100% + 80px);
   }
 }
+
+/* Filename scroll: support horizontal scrolling with visible scrollbar */
+.filename-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+  /* Hide scrollbar by default, show on hover/focus */
+  scrollbar-width: none; /* Firefox */
+}
+
+.filename-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+  width: 4px;
+  height: 4px;
+}
+
+.filename-scroll:hover::-webkit-scrollbar,
+.filename-scroll:focus::-webkit-scrollbar {
+  display: block;
+}
+
+.filename-scroll:hover::-webkit-scrollbar-thumb,
+.filename-scroll:focus::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 2px;
+}
+
+.filename-scroll:hover::-webkit-scrollbar-thumb:hover,
+.filename-scroll:focus::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Visual indicator for truncated text */
+.filename-truncated::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to right, transparent, rgba(0,0,0,0.05));
+  pointer-events: none;
+}
+
+.dark .filename-truncated::after {
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.05));
+}
+
+/* Touch device: always show scroll indicator */
+@media (hover: none) {
+  .filename-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+  }
+  
+  .filename-scroll::-webkit-scrollbar {
+    display: block;
+  }
+}

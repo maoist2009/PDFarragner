@@ -23,7 +23,7 @@ export default function FileUpload({ lang, onFilesConfirmed, hasExistingFiles }:
   const handleFiles = useCallback((fileList: FileList) => {
     const files = Array.from(fileList).filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
     if (files.length === 0) return;
-
+    
     const pending = files.map((f, i) => ({
       id: `pf_${Date.now()}_${i}`,
       file: f,
@@ -78,24 +78,21 @@ export default function FileUpload({ lang, onFilesConfirmed, hasExistingFiles }:
           {pendingFiles.map((pf, idx) => (
             <div
               key={pf.id}
-              className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 transition-colors"
+              draggable
+              onDragStart={() => handleDragStart(idx)}
+              onDragEnter={() => handleDragEnter(idx)}
+              onDragEnd={handleDragEnd}
+              onDragOver={(e) => e.preventDefault()}
+              className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-grab active:cursor-grabbing hover:border-blue-400 transition-colors"
             >
-              <span className="text-gray-400 text-lg select-none">ðŸ“„</span>
+              <span className="text-gray-400 text-lg select-none">â ?/span>
               <span className="font-medium text-sm text-gray-500 w-6">{idx + 1}</span>
-              <div className="flex-1 min-w-0 relative">
-                <div 
-                  className="text-sm text-gray-800 dark:text-gray-200 filename-scroll" 
-                  title={pf.name}
-                >
-                  {pf.name}
-                </div>
-              </div>
+              <span className="flex-1 text-sm text-gray-800 dark:text-gray-200 overflow-x-auto scrollbar-hide" style="whiteSpace: "nowrap"" title={pf.name}>{pf.name}</span>
               <button
                 onClick={() => removeFile(idx)}
                 className="text-red-400 hover:text-red-600 p-1"
               >
-                ðŸ—‘
-              </button>
+                âœ?              </button>
             </div>
           ))}
         </div>

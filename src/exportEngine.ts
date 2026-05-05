@@ -1,5 +1,5 @@
 import { PDFDocument, PageSizes, PDFDict, PDFName, PDFHexString, PDFNumber } from 'pdf-lib';
-import JSZip from 'jszip';
+import * as JSZip from 'jszip';
 import type { VirtualPage, PDFSourceFile, OutlineItem } from './types';
 
 interface ExportSegment {
@@ -92,6 +92,13 @@ function buildOutlineForSegment(
     result.push({ title: n.title, localPage, depth: n.depth });
   }
   return result;
+}
+
+// ─── Optimize PDF by removing unused resources ───
+
+async function optimizePDF(_doc: PDFDocument): Promise<void> {
+  // pdf-lib automatically handles optimization during save
+  // This function is a placeholder for future optimization steps
 }
 
 // ─── Write outline into PDFDocument using pdf-lib low-level API ───
@@ -272,7 +279,16 @@ export async function exportToZip(
       }
     }
 
-    const pdfBytes = await outDoc.save();
+    // Run optimization before saving
+    await optimizePDF(outDoc);
+
+    // Save with compression and object stream options enabled
+    // useObjectStreams: true - enables PDF object streams for better compression
+    // This groups related objects into streams, reducing file size
+    const pdfBytes = await outDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false,
+    });
     zip.file(seg.name, pdfBytes);
   }
 
